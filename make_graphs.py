@@ -36,10 +36,10 @@ def main(argv=None):
         fig = Figure(figsize=(10, 5))
         FigureCanvasAgg(fig)  # why do i have to do this?
         ax = fig.add_subplot(1, 1, 1)
-        x = np.array([float(i)*4 for i in range(len(NUM_INSTANCES))])
+        x = np.array([float(i)*(len(STORAGE_DRIVERS)+1) for i in range(len(NUM_INSTANCES))])
         bars = []
 
-        for driver, color in zip(STORAGE_DRIVERS, 'mbc'):
+        for driver, color in zip(STORAGE_DRIVERS, 'mbcg'):
             means = []
             for num_instances in NUM_INSTANCES:
                 means.append(average_from_file(os.path.join(

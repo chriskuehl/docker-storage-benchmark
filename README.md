@@ -15,7 +15,8 @@ recovery of `/var/lib/docker`. I have yet to be able to break overlay2 at all.)
 
 ## Results (as of 2016-06-27)
 
-I ran some early tests against `aufs`, `overlay`, and `overlay2`.
+I ran some early tests against `aufs`, `overlay`, and `overlay2`. I also ran
+the tests against ext4 without Docker. The raw data is in `results`.
 
 For all of these graphs, smaller bars are better. Some of these are pretty open
 to interpretation, so mostly just providing the raw graphs. In rough order of
@@ -31,12 +32,12 @@ byte to large files can be very expensive.
 With aufs, appending to files in parallel quickly becomes extremely expensive
 with lots of files:
 
-![](https://i.fluffy.cc/bsb85DCjKGr9Lrkrz2gfS5Ww1cWSdDFV.png)
+![](https://i.fluffy.cc/GjjxQmVTtCH31ZR7PVpR9xMwhzQ8LBqK.png)
 
 A similar test which involves appending to files in a binary tree (described
 better below) was much more drastic:
 
-![](https://i.fluffy.cc/qcf9GCwhGvlkGcTlZ1V97mltCvsSwXrP.png)
+![](https://i.fluffy.cc/gWtX0x4kFc2K6C5tvJfBkwJCpRMscHv1.png)
 
 This might suggest that aufs suffers with some kinds of large directory
 structures?
@@ -52,27 +53,27 @@ The test works by doing a DFS on a deep binary tree (directory structure) until
 hitting a leaf node, then reading the file. It does `readlink` on the
 intermediate directories.
 
-![](https://i.fluffy.cc/Tqvb767CGGn9vrFMpM5FcP6Nw1MQDt6Q.png)
+![](https://i.fluffy.cc/mJpw5R00wk7fdG2stFd3NTcpW6WW70Qp.png)
 
 Here is the exact same test but with the binary tree in the Docker filesystem
 (not mounted with `-v`):
 
-![](https://i.fluffy.cc/LbBnQwmJ75VKgQG7xVCwkP1JnR77t5N0.png)
+![](https://i.fluffy.cc/p82fnZ5bdMNM3LZnml7pMkWDSznpzZBC.png)
 
 Reading lots of small files in parallel:
 
-![](https://i.fluffy.cc/kFjMRncFlXsV9qh2TcrghF9P45QZq1CH.png)
+![](https://i.fluffy.cc/Rrrs8xnbVzx8hh4Xbk7TXxHGZqgS5bMj.png)
 
 
 ### Some not very interesting results
 
 Reading a small number of large files:
 
-![](https://i.fluffy.cc/nL50t4qV7M03GR39hV3XZJQL3tldqPnB.png)
+![](https://i.fluffy.cc/S7vfD6ZQ2rqz95pFVFlxgzWbkfc9kzLJ.png)
 
 Appending a line to a small number of large files:
 
-![](https://i.fluffy.cc/w8k0xjQ4CV8HR8fVQ6MSGmFctrBtjwQB.png)
+![](https://i.fluffy.cc/Bgzs12VvCmv18C3VSvRP4FFrLJ2tVjHC.png)
 
 
 ### Test machine specs
@@ -86,7 +87,3 @@ itself.
   Debian's kernel builds in stretch)
 * 32-core Intel Sandy Bridge, 256 GB RAM
 * SSDs in RAID 10
-
-I didn't have a lot of time to run these tests (the aufs ones take *forever*),
-so the sample sizes are currently about 5 each. I'm running more as you read
-this and will eventually update the graphs.

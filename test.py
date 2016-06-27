@@ -9,7 +9,7 @@ from functools import lru_cache
 
 NUM_RUNS_PER_TEST = 5
 NUM_INSTANCES = (1, 5, 10, 50, 100)
-STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2')
+STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'no-docker-ext4')
 
 
 def running_containers():
@@ -33,31 +33,38 @@ def docker_storage_driver():
     return m.group(1).decode('utf8')
 
 
-def run_tests(tests, num_runs=NUM_RUNS_PER_TEST, num_instances_scenarios=NUM_INSTANCES):
+def run_tests(tests, in_docker=True, num_runs=NUM_RUNS_PER_TEST, num_instances_scenarios=NUM_INSTANCES):
     for run in range(num_runs):
         for num_instances in num_instances_scenarios:
             for test in tests:
                 test_name = '{test}.{num_instances}.{storage_driver}'.format(
                     test=test,
                     num_instances=num_instances,
-                    storage_driver=docker_storage_driver(),
+                    storage_driver=docker_storage_driver() if in_docker else 'no-docker-ext4',
                 )
                 print('running test: {}'.format(test_name))
+
+                if not in_docker:
+                    subprocess.check_call(('rm', '-rf', '/test'))
+                    subprocess.check_call(('cp', '-r', '/test-master', '/test'))
 
                 assert len(running_containers()) == 0
                 start = time.time()
                 procs = [
                     subprocess.Popen(
                         (
-                            'docker', 'run', '--rm',
-                            '-v', '{}:/mnt:ro'.format(os.getcwd()),
-                            'benchmark',
+                            (
+                                'docker', 'run', '--rm',
+                                '-v', '{}:/mnt:ro'.format(os.getcwd()),
+                                'benchmark',
+                            ) if in_docker else ()
+                        ) +
+                        (
                             '/mnt/test-several-times',
                             str(num_instances),
                             '/mnt/tests/{}'.format(test),
                         ),
                     )
-#                    for _ in range(num_instances)
                 ]
 
                 while procs:
@@ -76,7 +83,7 @@ def all_tests():
 
 
 def main(argv=None):
-    run_tests(all_tests())
+    run_tests(all_tests(), in_docker=False)
 
 
 if __name__ == '__main__':
