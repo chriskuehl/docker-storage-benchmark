@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+# Read each file in the binary tree.
+exec > /dev/null
+explore() {
+    local dir="$1"
+    pushd "$dir"
+    readlink -f .
+    if [ -f oh-hi ]; then
+        readlink -f oh-hi
+        cat oh-hi
+    else
+        explore 0
+        explore 1
+    fi
+    popd
+}
+
+explore /mnt/tree-of-files

@@ -1,3 +1,29 @@
 #!/bin/bash -eux
+systemctl stop docker || true
+umount -l /dev/sdb
+yes | mkfs.ext4 /dev/sdb
+mount /dev/sdb /var/lib/docker
+systemctl start docker
+
+make_tree() {
+    local cur="$1"
+    local remaining_depth="$2"
+    mkdir "$cur"
+    if [ "$remaining_depth" -gt 0 ]; then
+        make_tree "${cur}/0" "$((remaining_depth - 1))"
+        make_tree "${cur}/1" "$((remaining_depth - 1))"
+    else
+        echo "oh, hi!" > "${cur}/oh-hi"
+    fi
+}
+
+if [ ! -d tree-of-files ]; then
+    set +x
+    make_tree tree-of-files 14
+    set -x
+fi
+
 time docker build -t benchmark .
 time ./test.py
+
+exec $0

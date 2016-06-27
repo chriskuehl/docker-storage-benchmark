@@ -50,4 +50,4 @@ RUN bash -c 'make_tree() { \
 make_tree /test/tree-of-files 14 \
 '
 
-ENTRYPOINT ["dumb-init", "--"]
+ENTRYPOINT ["dumb-init", "-c", "--"]

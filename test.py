@@ -8,7 +8,8 @@ from functools import lru_cache
 
 
 NUM_RUNS_PER_TEST = 5
-NUM_INSTANCES = (1, 5, 20, 50, 100)
+NUM_INSTANCES = (1, 5, 10, 50, 100)
+STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2')
 
 
 def running_containers():
@@ -51,10 +52,12 @@ def run_tests(tests, num_runs=NUM_RUNS_PER_TEST, num_instances_scenarios=NUM_INS
                             'docker', 'run', '--rm',
                             '-v', '{}:/mnt:ro'.format(os.getcwd()),
                             'benchmark',
+                            '/mnt/test-several-times',
+                            str(num_instances),
                             '/mnt/tests/{}'.format(test),
                         ),
                     )
-                    for _ in range(num_instances)
+#                    for _ in range(num_instances)
                 ]
 
                 while procs:
@@ -69,7 +72,7 @@ def run_tests(tests, num_runs=NUM_RUNS_PER_TEST, num_instances_scenarios=NUM_INS
 
 
 def all_tests():
-    return [test for test in os.listdir('tests') if not test.startswith('.')]
+    return sorted(test for test in os.listdir('tests') if not test.startswith('.'))
 
 
 def main(argv=None):

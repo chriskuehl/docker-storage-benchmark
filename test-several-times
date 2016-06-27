@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+for _ in $(seq 1 "$1"); do
+    "$2" &
+done
+
+wait
