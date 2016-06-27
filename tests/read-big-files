@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# Read each big file via cat.
+for f in /test/big-files/*; do
+    cat "$f" > /dev/null
+done

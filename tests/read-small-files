@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# Read each small file via cat.
+for f in /test/small-files/*; do
+    cat "$f" > /dev/null
+done

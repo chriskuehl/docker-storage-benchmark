@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# Install numpy into a virtualenv.
+exec > /dev/null
+virtualenv -ppython2.7 /test/venv
+/test/venv/bin/pip install numpy==1.10.4

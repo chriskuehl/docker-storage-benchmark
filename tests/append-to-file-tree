@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+# Append "ohai" to each file in the binary tree.
+exec > /dev/null
+explore() {
+    local dir="$1"
+    pushd "$dir"
+    if [ -f oh-hi ]; then
+        echo ohai >> oh-hi
+    else
+        explore 0
+        explore 1
+    fi
+    popd
+}
+
+explore /test/tree-of-files

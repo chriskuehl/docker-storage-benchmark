@@ -1,0 +1,4 @@
+/results
+*.py[co]
+
+/copy-and-run

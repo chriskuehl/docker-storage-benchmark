@@ -1,0 +1,3 @@
+#!/bin/bash -eux
+time docker build -t benchmark .
+time ./test.py

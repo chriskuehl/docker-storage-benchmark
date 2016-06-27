@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# Append "ohai" to each small file.
+for f in /test/small-files/*; do
+    echo ohai >> "$f"
+done
