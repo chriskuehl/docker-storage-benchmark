@@ -25,7 +25,7 @@ def average_from_file(path):
     try:
         with open(path) as f:
             lines = [float(line) for line in f.readlines()]
-        return sum(lines) / len(lines)
+        return min(lines)
     except FileNotFoundError:
         return 0
 

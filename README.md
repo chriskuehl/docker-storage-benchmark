@@ -31,12 +31,12 @@ byte to large files can be very expensive.
 With aufs, appending to files in parallel quickly becomes extremely expensive
 with lots of files:
 
-![](https://i.fluffy.cc/s4Xpwdx0pzhjSMJNZ4b4CTbc5r2mTMT9.png)
+![](https://i.fluffy.cc/bsb85DCjKGr9Lrkrz2gfS5Ww1cWSdDFV.png)
 
 A similar test which involves appending to files in a binary tree (described
 better below) was much more drastic:
 
-![](https://i.fluffy.cc/4qDkn7mkHM2q1W61Gp4fBprVqtx2xL8D.png)
+![](https://i.fluffy.cc/qcf9GCwhGvlkGcTlZ1V97mltCvsSwXrP.png)
 
 This might suggest that aufs suffers with some kinds of large directory
 structures?
@@ -52,27 +52,27 @@ The test works by doing a DFS on a deep binary tree (directory structure) until
 hitting a leaf node, then reading the file. It does `readlink` on the
 intermediate directories.
 
-![](https://i.fluffy.cc/tNPpHsgnRllqS4JdQNnLr3m3fWvz02J4.png)
+![](https://i.fluffy.cc/Tqvb767CGGn9vrFMpM5FcP6Nw1MQDt6Q.png)
 
 Here is the exact same test but with the binary tree in the Docker filesystem
 (not mounted with `-v`):
 
-![](https://i.fluffy.cc/9bqzdL70VxL8zKt0x5Ht7HpT9qvxp9Nc.png)
+![](https://i.fluffy.cc/LbBnQwmJ75VKgQG7xVCwkP1JnR77t5N0.png)
 
 Reading lots of small files in parallel:
 
-![](https://i.fluffy.cc/rthcV26tGZgF1Q9k8dJD5CrzlzdMlDgL.png)
+![](https://i.fluffy.cc/kFjMRncFlXsV9qh2TcrghF9P45QZq1CH.png)
 
 
 ### Some not very interesting results
 
 Reading a small number of large files:
 
-![](https://i.fluffy.cc/bdrvbkNh7K82J8h0l5PZ6hq3426TnLKF.png)
+![](https://i.fluffy.cc/nL50t4qV7M03GR39hV3XZJQL3tldqPnB.png)
 
 Appending a line to a small number of large files:
 
-![](https://i.fluffy.cc/nJL9SBMBLdcvhJ2v8GwzLK4RQKsXGBKt.png)
+![](https://i.fluffy.cc/w8k0xjQ4CV8HR8fVQ6MSGmFctrBtjwQB.png)
 
 
 ### Test machine specs
