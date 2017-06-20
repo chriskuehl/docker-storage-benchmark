@@ -7,7 +7,7 @@ import time
 from functools import lru_cache
 
 
-NUM_RUNS_PER_TEST = 5
+NUM_RUNS_PER_TEST = 10
 NUM_INSTANCES = (1, 5, 10, 50, 100)
 STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'no-docker-ext4')
 
@@ -83,7 +83,7 @@ def all_tests():
 
 
 def main(argv=None):
-    run_tests(all_tests(), in_docker=False)
+    run_tests(all_tests(), in_docker=True)
 
 
 if __name__ == '__main__':

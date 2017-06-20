@@ -2,3 +2,5 @@
 *.py[co]
 
 /copy-and-run
+/test
+/tree-of-files
