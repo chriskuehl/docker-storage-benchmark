@@ -22,7 +22,7 @@ from functools import lru_cache
 
 NUM_RUNS_PER_TEST = 10
 NUM_INSTANCES = (1, 5, 10, 50, 100)
-STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'no-docker-ext4')
+STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'no-docker-tmpfs')
 
 
 def running_containers():
@@ -53,13 +53,13 @@ def run_tests(tests, in_docker=True, num_runs=NUM_RUNS_PER_TEST, num_instances_s
                 test_name = '{test}.{num_instances}.{storage_driver}'.format(
                     test=test,
                     num_instances=num_instances,
-                    storage_driver=docker_storage_driver() if in_docker else 'no-docker-ext4',
+                    storage_driver=docker_storage_driver() if in_docker else 'no-docker-tmpfs',
                 )
                 print('running test: {}'.format(test_name))
 
                 if not in_docker:
-                    subprocess.check_call(('rm', '-rf', '/test'))
-                    subprocess.check_call(('cp', '-r', '/test-master', '/test'))
+                    subprocess.check_call(('rm', '-rf', '/tmp/test'))
+                    subprocess.check_call(('cp', '-r', '/tmp/test-master', '/tmp/test'))
 
                 assert len(running_containers()) == 0
                 start = time.time()
