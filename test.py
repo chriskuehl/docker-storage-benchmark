@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+# Instructions to run tests:
+#   1. Create the docker image: docker build -t benchmark .
+#   2. Copy the test directory out (for the non-docker tests):
+#      $ docker create benchmark
+#      $ docker create <the id>:/test /test-master
+#   3. Create a local "tree-of-files" for the "read-file-tree-mounted" test
+#      $ cp -r /test-master/tree-of-files .
+#   4. Run tests: ./test.py
+#
+#   You'll have to repeat #1 for each for new storage driver since the
+#   "benchmark" image will disappear.
+#
+# TODO: make these instructions more automatic
 import os
 import re
 import subprocess
