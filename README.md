@@ -8,15 +8,15 @@ Tests are in the `tests` directory. Each test is spawned inside one container
 several times (depending on the parallelization being tested). There are other
 potential tests (like running lots of containers), but I didn't find many
 differences between the storage drivers doing this, and I was more interested
-in parallel IO inside individual containers (I *did* find that it is easy to
-break both aufs and overlay with many containers, sometimes requiring manual
-recovery of `/var/lib/docker`. I have yet to be able to break overlay2 at all.)
+in parallel IO inside individual containers.
 
 
-## Results (as of 2016-06-27)
+## Results (as of 2017-10-28)
 
-I ran some early tests against `aufs`, `overlay`, and `overlay2`. I also ran
-the tests against ext4 without Docker. The raw data is in `results`.
+I ran some early tests against `aufs`, `overlay`, `overlay2`, and
+`devicemapper`. I also ran the tests against tmpfs without Docker. The raw data
+is in `results`. The full details (Docker version, machine specs, etc. are at
+the bottom of this README).
 
 For all of these graphs, smaller bars are better. Some of these are pretty open
 to interpretation, so mostly just providing the raw graphs. In rough order of
@@ -32,12 +32,12 @@ byte to large files can be very expensive.
 With aufs, appending to files in parallel quickly becomes extremely expensive
 with lots of files:
 
-![](https://i.fluffy.cc/GjjxQmVTtCH31ZR7PVpR9xMwhzQ8LBqK.png)
+![](https://i.fluffy.cc/hVJ4JG1Zg26Dk8mfZLmRKGs2JK2mk0dD.png)
 
 A similar test which involves appending to files in a binary tree (described
 better below) was much more drastic:
 
-![](https://i.fluffy.cc/gWtX0x4kFc2K6C5tvJfBkwJCpRMscHv1.png)
+![](https://i.fluffy.cc/xtcTCLbDpGs5JCcBBL02Mfh24P23BLGV.png)
 
 This might suggest that aufs suffers with some kinds of large directory
 structures?
@@ -53,37 +53,55 @@ The test works by doing a DFS on a deep binary tree (directory structure) until
 hitting a leaf node, then reading the file. It does `readlink` on the
 intermediate directories.
 
-![](https://i.fluffy.cc/mJpw5R00wk7fdG2stFd3NTcpW6WW70Qp.png)
+![](https://i.fluffy.cc/nPmHCP8PFgQ9dPzcVTkLfNP6fT5WX9nD.png)
 
 Here is the exact same test but with the binary tree in the Docker filesystem
 (not mounted with `-v`):
 
-![](https://i.fluffy.cc/p82fnZ5bdMNM3LZnml7pMkWDSznpzZBC.png)
+![](https://i.fluffy.cc/34gMq4ZBtRqfvjbctgMHBTs196gH4vn7.png)
 
 Reading lots of small files in parallel:
 
-![](https://i.fluffy.cc/Rrrs8xnbVzx8hh4Xbk7TXxHGZqgS5bMj.png)
+![](https://i.fluffy.cc/6fQq11mwkzzkBJVpMSDmBMP76LQt5084.png)
 
 
 ### Some not very interesting results
 
 Reading a small number of large files:
 
-![](https://i.fluffy.cc/S7vfD6ZQ2rqz95pFVFlxgzWbkfc9kzLJ.png)
+![](https://i.fluffy.cc/hQQbXPG80s0kgMbhJMVd2j6H8CMrqm5m.png)
 
 Appending a line to a small number of large files:
 
-![](https://i.fluffy.cc/Bgzs12VvCmv18C3VSvRP4FFrLJ2tVjHC.png)
+![](https://i.fluffy.cc/GMz4qVBzl2FVDHnskCtPkrTFZ4PMmBb7.png)
+
+
+### All test graphs by name:
+
+* [`append-to-big-files`](https://i.fluffy.cc/GMz4qVBzl2FVDHnskCtPkrTFZ4PMmBb7.png)
+* [`append-to-file-tree`](https://i.fluffy.cc/xtcTCLbDpGs5JCcBBL02Mfh24P23BLGV.png)
+* [`append-to-small-files`](https://i.fluffy.cc/hVJ4JG1Zg26Dk8mfZLmRKGs2JK2mk0dD.png)
+* [`read-big-files`](https://i.fluffy.cc/hQQbXPG80s0kgMbhJMVd2j6H8CMrqm5m.png)
+* [`read-file-tree-mounted`](https://i.fluffy.cc/nPmHCP8PFgQ9dPzcVTkLfNP6fT5WX9nD.png)
+* [`read-file-tree`](https://i.fluffy.cc/34gMq4ZBtRqfvjbctgMHBTs196gH4vn7.png)
+* [`read-small-files`](https://i.fluffy.cc/6fQq11mwkzzkBJVpMSDmBMP76LQt5084.png)
 
 
 ### Test machine specs
 
-All the tests were run on the same physical machine and each had the machine to
-itself.
+All the tests were run on a [`c4.8xlarge`][c4.8xlarge] EC2 instance.
 
-* Docker 1.12rc2
-* Debian stretch (as of 2016-06-27)
-* Kernel 4.6.0 for overlay, 3.16 for aufs (since `aufs` was taken out of
-  Debian's kernel builds in stretch)
-* 32-core Intel Sandy Bridge, 256 GB RAM
-* SSDs in RAID 10
+* Docker 17.09.0-ce
+* Debian stretch
+* Kernel 4.9.51 (stock Debian except for `aufs` tests, which used a
+  custom-built 4.9.51 kernel with the aufs patches applied)
+* 36 "vCPUs", 60 GiB RAM
+* `tmpfs` as backing filesystem for all tests except `devicemapper`. For
+  `devicemapper`, LVM was configured as recommended by [the
+  docs][devicemapper-config], using a ramdisk as the backing physical volume.
+  Doing all writes against a tmpfs/ramdisk was an attempt to avoid variances in
+  the underlying IO speed of EBS or instance storage.
+
+
+[c4.8xlarge]: http://www.ec2instances.info/?selected=c4.8xlarge
+[devicemapper-config]: https://docs.docker.com/engine/userguide/storagedriver/device-mapper-driver/

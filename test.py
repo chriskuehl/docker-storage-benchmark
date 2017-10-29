@@ -22,7 +22,7 @@ from functools import lru_cache
 
 NUM_RUNS_PER_TEST = 10
 NUM_INSTANCES = (1, 5, 10, 50, 100)
-STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'no-docker-tmpfs')
+STORAGE_DRIVERS = ('aufs', 'overlay', 'overlay2', 'devicemapper', 'no-docker-tmpfs')
 
 
 def running_containers():
