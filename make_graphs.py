@@ -39,7 +39,7 @@ def main(argv=None):
         x = np.array([float(i)*(len(STORAGE_DRIVERS)+1) for i in range(len(NUM_INSTANCES))])
         bars = []
 
-        for driver, color in zip(STORAGE_DRIVERS, 'mbcg'):
+        for driver, color in zip(STORAGE_DRIVERS, 'mbcgy'):
             means = []
             for num_instances in NUM_INSTANCES:
                 means.append(average_from_file(os.path.join(
